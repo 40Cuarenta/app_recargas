@@ -1,4 +1,4 @@
-# Aplicación de Recargas Electrónicas Ecuador 📱⚡
+# Aplicación de Recargas Electrónicas Ecuador 
 
 Sistema de simulación de venta y liquidación de recargas y combos celulares para puntos de venta en Ecuador. Construido con **Flutter**, aplicando rigurosamente **Atomic Design**, arquitectura **MVC**, diseño de **Material 3**, rutas nombradas centralizadas y gestión de estado reactiva con **Provider (`ChangeNotifier`)**.
 
@@ -18,7 +18,7 @@ El proyecto sigue una separación estricta de responsabilidades en tres capas ar
 
 ---
 
-## 📂 Estructura de Carpetas (`lib/`)
+## Estructura de Carpetas (`lib/`)
 
 ```text
 lib/
@@ -61,7 +61,7 @@ lib/
 
 ---
 
-## 👥 Usuarios de Prueba (Credenciales)
+## Usuarios de Prueba (Credenciales)
 
 | Usuario | Contraseña | Nombre Completo | Saldo Inicial | Combo Activo |
 | :--- | :--- | :--- | :--- | :--- |
@@ -93,7 +93,7 @@ lib/
 
 ---
 
-## 🔄 Flujo de Navegación
+## Flujo de Navegación
 
 ```text
 [Login] ──▶ [Home / Dashboard] ──▶ [Paso 1: Número] ──▶ [Paso 2: Operadora]
@@ -107,7 +107,7 @@ lib/
 
 ---
 
-## 🚀 Cómo Ejecutar el Proyecto
+## Cómo Ejecutar el Proyecto
 
 ### Requisitos Previos
 * Flutter SDK $\ge 3.13.5$
