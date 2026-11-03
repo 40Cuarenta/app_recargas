@@ -4,7 +4,7 @@ Sistema de simulación de venta y liquidación de recargas y combos celulares pa
 
 ---
 
-## 🏛️ Arquitectura del Proyecto
+## Arquitectura del Proyecto
 
 El proyecto sigue una separación estricta de responsabilidades en tres capas arquitecturales:
 
@@ -73,7 +73,7 @@ lib/
 
 ---
 
-## 📊 Reglas de Negocio y Finanzas
+## Reglas de Negocio y Finanzas
 
 * **Comisión al cliente**:
   $$\text{Comisión} = \text{Valor} \times \% \text{ Comisión}$$
