@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../atoms/app_button.dart';
 import '../atoms/app_label.dart';
@@ -20,6 +21,7 @@ class LoginForm extends StatelessWidget {
 
   /// Callback ejecutado cuando el usuario presiona "Iniciar sesión".
   final VoidCallback onSubmit;
+  final VoidCallback onLimpiar;
 
   /// Indica si se está procesando la solicitud de autenticación (muestra spinner en el botón).
   final bool isLoading;
@@ -33,6 +35,7 @@ class LoginForm extends StatelessWidget {
     required this.usuarioController,
     required this.contrasenaController,
     required this.onSubmit,
+    required this.onLimpiar,
     this.isLoading = false,
     this.errorMessage,
   });
@@ -103,9 +106,15 @@ class LoginForm extends StatelessWidget {
             isLoading: isLoading,
             onPressed: onSubmit,
           ),
+          const SizedBox(height: 12),
+          AppButton(
+            text: 'Limpiar',
+            icon: Icons.cleaning_services_outlined,
+            variant: AppButtonVariant.secundario,
+            onPressed: isLoading ? null : onLimpiar,
+          ),
         ],
       ),
     );
   }
 }
-

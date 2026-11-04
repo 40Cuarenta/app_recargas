@@ -69,7 +69,7 @@ class Validators {
     final limpio = value.trim().replaceAll(',', '.');
     final double? valor = double.tryParse(limpio);
 
-    if (valor == null) {
+    if (valor == null || !valor.isFinite) {
       return 'Ingrese un monto numérico válido (ej. 5.00).';
     }
 
@@ -81,6 +81,9 @@ class Validators {
       return 'El monto máximo permitido es \$${maximo.toStringAsFixed(2)}.';
     }
 
+    if (!RegExp(r'^[0-9]+(\.[0-9]{1,2})?$').hasMatch(limpio)) {
+      return 'Usa un monto con hasta dos decimales.';
+    }
     return null;
   }
 
@@ -100,4 +103,3 @@ class Validators {
     return null;
   }
 }
-

@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
+
 import '../data/datos_simulados.dart';
 import '../models/operadora.dart';
 import '../models/paquete.dart';
 import '../models/recarga.dart';
 import 'auth_controller.dart';
+import '../core/utils/validators.dart';
 
 /// Controlador de Recargas y Operaciones Transaccionales (ChangeNotifier).
 /// Mantiene y administra el estado completo del flujo de recarga:
-/// Paso 1: Número telefónico
-/// Paso 2: Selección de operadora
-/// Paso 3: Selección de modalidad (Recarga o Paquete) y monto
-/// Paso 4: Selección de método de pago y comprobante
-/// Paso 5: Confirmación de pago y generación de recibo
+/// El formulario principal reúne teléfono, operadora, servicio y pago.
+/// El comprobante presenta el cálculo y confirma la operación en la misma pantalla.
 class RecargaController extends ChangeNotifier {
   // --- Estado del Flujo Transaccional ---
   String _numeroTelefono = '';
@@ -21,13 +20,11 @@ class RecargaController extends ChangeNotifier {
   Paquete? _paqueteSeleccionado;
   MetodoPago _metodoPago = MetodoPago.debitoCuenta;
 
-  int _pasoActual = 1;
   String? _error;
   bool _procesando = false;
   Recarga? _ultimoComprobante;
 
   // --- Getters de Lectura Reactiva ---
-  int get pasoActual => _pasoActual;
   String get numeroTelefono => _numeroTelefono;
   Operadora? get operadora => _operadora;
   TipoRecarga get tipo => _tipo;
@@ -163,12 +160,21 @@ class RecargaController extends ChangeNotifier {
   Future<Recarga?> confirmarPago({
     required AuthController authController,
   }) async {
+    if (_procesando) return null;
+    if (_ultimoComprobante != null) return _ultimoComprobante;
     _procesando = true;
     _error = null;
     notifyListeners();
 
     // 1. Validar integridad de datos
-    if (_numeroTelefono.isEmpty || _operadora == null || valorBase <= 0) {
+    if (Validators.validarTelefono(_numeroTelefono) != null ||
+        _operadora == null ||
+        !valorBase.isFinite ||
+        valorBase <= 0 ||
+        (_tipo == TipoRecarga.recarga && (valorBase < 1 || valorBase > 100)) ||
+        (_tipo == TipoRecarga.paquete &&
+            (_paqueteSeleccionado == null ||
+                _paqueteSeleccionado!.operadoraId != _operadora!.id))) {
       _error = 'Datos de recarga incompletos. Verifique los pasos anteriores.';
       _procesando = false;
       notifyListeners();
@@ -225,14 +231,8 @@ class RecargaController extends ChangeNotifier {
     return comprobante;
   }
 
-  /// Paso actual del flujo de recargas (1 a 4).
-  void setPasoActual(int paso) {
-    _pasoActual = paso;
-  }
-
   /// Reinicia todos los estados del flujo de recarga para permitir una nueva operación.
   void reiniciar() {
-    _pasoActual = 1;
     _numeroTelefono = '';
     _operadora = null;
     _tipo = TipoRecarga.recarga;
@@ -245,4 +245,3 @@ class RecargaController extends ChangeNotifier {
     notifyListeners();
   }
 }
-

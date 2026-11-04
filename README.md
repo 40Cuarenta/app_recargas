@@ -1,138 +1,69 @@
-# Aplicación de Recargas Electrónicas Ecuador 
+# Aplicación de recargas electrónicas
 
-Sistema de simulación de venta y liquidación de recargas y combos celulares para puntos de venta en Ecuador. Construido con **Flutter**, aplicando rigurosamente **Atomic Design**, arquitectura **MVC**, diseño de **Material 3**, rutas nombradas centralizadas y gestión de estado reactiva con **Provider (`ChangeNotifier`)**.
+Simulación educativa en Flutter para la opción 2 del Informe 1.2. Conserva MVC,
+Atomic Design, Provider y el tema original. Los usuarios, precios y porcentajes
+son datos de prueba; no se conecta a bancos ni a operadoras.
 
----
+## Tres pantallas
 
-## Arquitectura del Proyecto
+1. **Inicio de sesión (`/`)**: usuario, contraseña, mostrar/ocultar contraseña,
+   validación, acceso rápido de prueba y botón **Limpiar**.
+2. **Principal (`/home`)**: cuenta, saldo, combo actual, teléfono, operadora,
+   recarga directa o paquete, montos rápidos y método de pago. Permite revisar
+   la operación, limpiar el formulario y cerrar sesión con confirmación.
+3. **Comprobante (`/comprobante`)**: detalle, comisión, total, ganancia y confirmación.
+   Tras pagar, esta misma pantalla muestra la animación y el recibo final.
+   Volver antes de pagar conserva los datos; volver después limpia el formulario.
 
-El proyecto sigue una separación estricta de responsabilidades en tres capas arquitecturales:
+## Organización
 
-1. **Modelos (`lib/models/`)**: Entidades de datos inmutables con constructores `const` y métodos `copyWith`.
-2. **Controladores (`lib/controllers/`)**: Lógica de negocio y finanzas desacoplada de la interfaz gráfica usando `ChangeNotifier` (`AuthController` y `RecargaController`).
-3. **Vistas (`lib/views/`)**: Jerarquía visual modular basada en **Atomic Design**:
-   - **Átomos (`lib/views/widgets/atoms/`)**: Componentes indivisibles (botones, campos de texto, títulos, etiquetas, badges).
-   - **Moléculas (`lib/views/widgets/molecules/`)**: Agrupaciones de átomos con propósito funcional simple (tarjetas de paquete, fichas de operadora, filas de resumen, selectores segmentados).
-   - **Organismos (`lib/views/widgets/organisms/`)**: Secciones complejas e independientes (formulario de login, cuadrícula de operadoras, formulario de recarga, comprobante financiero, animación de éxito).
-   - **Pantallas (`lib/views/screens/`)**: Vistas completas (`Scaffold`) que conectan los organismos a los controladores.
+- `lib/models/`: usuario, operadora, paquete y recarga.
+- `lib/controllers/`: sesión y flujo de recarga con `ChangeNotifier`.
+- `lib/views/widgets/atoms/`: botones, textos, campos y selección.
+- `lib/views/widgets/molecules/`: selector de operadora, pago y tarjetas.
+- `lib/views/widgets/organisms/`: formularios, cuenta y comprobante.
+- `lib/views/screens/`: las tres pantallas.
+- `lib/core/`: rutas, tema, validadores y formato de porcentajes.
+- `lib/data/datos_simulados.dart`: catálogos y reglas de liquidación.
 
----
+## Cuentas de prueba
 
-## Estructura de Carpetas (`lib/`)
+| Usuario | Contraseña | Saldo inicial |
+|---|---|---:|
+| cajero1 | 123456 | $150.00 |
+| admin | admin123 | $520.50 |
+| ventas_sur | recargas2026 | $75.25 |
 
-```text
-lib/
-├── config/
-│   └── rutas.dart                      # Exportación y compatibilidad de rutas
-├── controllers/
-│   ├── auth_controller.dart            # Sesión, login, logout y actualización de saldo
-│   └── recarga_controller.dart         # Estado del flujo de recarga, cálculos y confirmación
-├── core/
-│   ├── routes/
-│   │   └── app_routes.dart             # Centralización de rutas nombradas y onGenerateRoute
-│   ├── theme/
-│   │   ├── app_colors.dart             # Paleta cromática Fintech & Telecom (sin colores hardcodeados)
-│   │   ├── app_text_styles.dart        # Jerarquía tipográfica local ('AppFont')
-│   │   └── app_theme.dart              # ThemeData Material 3, InputDecorationTheme, botones
-│   └── utils/
-│       └── validators.dart             # Validadores estáticos puros para formularios
-├── data/
-│   └── datos_simulados.dart            # Mock data (operadoras, paquetes, usuarios y reglas financieras)
-├── models/
-│   ├── operadora.dart                  # Modelo de compañía de telecomunicaciones
-│   ├── paquete.dart                    # Modelo de combo / paquete de datos y vigencia
-│   ├── recarga.dart                    # Modelo de transacción y comprobante digital
-│   └── usuario.dart                    # Modelo de usuario / punto de venta
-├── views/
-│   ├── screens/
-│   │   ├── comprobante_screen.dart     # Paso 4: Detalle pre-liquidación y medio de pago
-│   │   ├── home_screen.dart            # Pantalla principal (Bienvenida, Mi Combo, Saldo)
-│   │   ├── login_screen.dart           # Inicio de sesión con credenciales
-│   │   ├── nueva_recarga_screen.dart   # Paso 3: Selección de monto o catálogo de combos
-│   │   ├── numero_recarga_screen.dart  # Paso 1: Ingreso y validación de número celular
-│   │   ├── operadoras_screen.dart      # Paso 2: Selección de operadora móvil
-│   │   └── pago_exitoso_screen.dart    # Paso 5: Animación de éxito y comprobante final
-│   └── widgets/
-│       ├── atoms/                      # Átomos (AppButton, AppTextField, AppLogo, AppLabel, etc.)
-│       ├── molecules/                  # Moléculas (InfoCard, OperadoraTile, PaqueteCard, etc.)
-│       └── organisms/                  # Organismos (LoginForm, ComprobanteDetalle, etc.)
-└── main.dart                           # Punto de entrada con MultiProvider y MaterialApp
+## Cálculos
+
+- Comisión = valor base × porcentaje efectivo de comisión.
+- Total = valor base + comisión.
+- Ganancia estimada = valor base × porcentaje de ganancia.
+- Desde $10, una comisión mayor al 3 % baja un punto porcentual.
+- Los porcentajes fraccionarios se muestran sin convertir 6,5 % en 7 %.
+- Débito de cuenta valida y descuenta el total; tarjeta solo simula aprobación.
+- La ganancia se informa y no se acredita al saldo. El estado se conserva en
+  memoria durante la sesión y no hay historial permanente.
+- Recarga directa: entre $1 y $100 y hasta dos decimales, con punto o coma.
+- Teléfono: diez dígitos e inicio 09. Los paquetes pertenecen a su operadora.
+
+Ejemplo: Movistar, $10 → comisión $0.30, total $10.30, ganancia $0.45.
+
+## Ejecutar
+
+Se requiere Flutter con Dart compatible con `^3.13.5` y un dispositivo conectado.
+Desde esta carpeta:
+
+```powershell
+flutter pub get
+flutter devices
+flutter run -t lib/main.dart
 ```
 
----
+Para verificar:
 
-## Usuarios de Prueba (Credenciales)
-
-| Usuario | Contraseña | Nombre Completo | Saldo Inicial | Combo Activo |
-| :--- | :--- | :--- | :--- | :--- |
-| **`cajero1`** | `123456` | Edison Proaño | **\$150.00** | Movistar Mega Combo (\$10) |
-| **`admin`** | `admin123` | María Belén González | **\$520.50** | CNT Corporativo (\$20) |
-| **`ventas_sur`** | `recargas2026` | Carlos Andrés Mera | **\$75.25** | Tuenti Semanal (\$5) |
-
-*(La pantalla de inicio de sesión incluye botones táctiles de acceso rápido para autocompletar credenciales).*
-
----
-
-## Reglas de Negocio y Finanzas
-
-* **Comisión al cliente**:
-  $$\text{Comisión} = \text{Valor} \times \% \text{ Comisión}$$
-* **Total a liquidar**:
-  $$\text{Total} = \text{Valor} + \text{Comisión}$$
-* **Ganancia para el punto de venta**:
-  $$\text{Ganancia} = \text{Valor} \times \% \text{ Ganancia}$$
-* **Regla comercial por volumen**: Si el valor de la recarga es $\ge \$10.00$, la comisión tiene una reducción preferencial de 1 punto porcentual ($-0.01$, piso base 3%).
-* **Esquema por operadora**:
-  * **Tigo**: 4% comisión cliente (3% si $\ge \$10$) | 5.0% ganancia local
-  * **Movistar**: 3% comisión cliente | 4.5% ganancia local (Ej. \$10 recarga $\rightarrow$ \$0.30 comisión $\rightarrow$ **\$10.30 total**, \$0.45 ganancia)
-  * **CNT**: 5% comisión cliente (4% si $\ge \$10$) | 6.0% ganancia local
-  * **Tuenti**: 3% comisión cliente | 4.0% ganancia local
-  * **Aki Móvil**: 4% comisión cliente | 5.5% ganancia local
-  * **MaxiPlus**: 5% comisión cliente | 6.5% ganancia local
-  * **Flash Móvil**: 3% comisión cliente | 5.0% ganancia local
-
----
-
-## Flujo de Navegación
-
-```text
-[Login] ──▶ [Home / Dashboard] ──▶ [Paso 1: Número] ──▶ [Paso 2: Operadora]
-                                                                  │
-[Home (Saldo descontado)] ◀── [Pago Exitoso] ◀── [Comprobante] ◀─ [Paso 3: Combo/Recarga]
+```powershell
+flutter analyze
+flutter test
+flutter build apk --debug
 ```
-
-* **Cerrar Sesión**: Muestra un `AlertDialog` de confirmación y regresa al `Login` limpiando el stack (`pushNamedAndRemoveUntil`).
-* **Pago Exitoso**: Al presionar *"Volver a pantalla principal"*, resetea el controlador y regresa al `Home` limpiando el historial de navegación.
-* **Sin paso de datos por argumentos sueltos**: Toda la información de la transacción fluye de manera reactiva mediante `RecargaController` y `AuthController`.
-
----
-
-## Cómo Ejecutar el Proyecto
-
-### Requisitos Previos
-* Flutter SDK $\ge 3.13.5$
-* Dispositivo físico, emulador Android/iOS o Windows Desktop
-
-### Comandos
-
-1. **Obtener dependencias**:
-   ```bash
-   flutter pub get
-   ```
-
-2. **Ejecutar análisis de código**:
-   ```bash
-   flutter analyze
-   ```
-   *(Resultado: 0 warnings, 0 errores).*
-
-3. **Ejecutar suite de pruebas unitarias y de widgets**:
-   ```bash
-   flutter test
-   ```
-   *(Valida todas las reglas de negocio, validaciones y flujos).*
-
-4. **Lanzar la aplicación**:
-   ```bash
-   flutter run
-   ```
