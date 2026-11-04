@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../core/routes/app_routes.dart';
 import '../../controllers/auth_controller.dart';
 import '../../core/theme/app_colors.dart';
@@ -29,6 +30,16 @@ class _LoginScreenState extends State<LoginScreen> {
     _usuarioController.dispose();
     _contrasenaController.dispose();
     super.dispose();
+  }
+
+  void _limpiar() {
+    _formKey.currentState!.reset();
+    _usuarioController.clear();
+    _contrasenaController.clear();
+    context.read<AuthController>().limpiarError();
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    FocusScope.of(context).unfocus();
+    setState(() {});
   }
 
   Future<void> _iniciarSesion() async {
@@ -67,17 +78,17 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 32.0,
+            ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 420),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Isotipo de marca destacado
-                  const AppLogo(
-                    size: 88,
-                    borderRadius: 24,
-                  ),
+                  const AppLogo(size: 88, borderRadius: 24),
                   const SizedBox(height: 16),
 
                   // Título principal de la aplicación
@@ -108,6 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         isLoading: authController.cargando,
                         errorMessage: authController.error,
                         onSubmit: _iniciarSesion,
+                        onLimpiar: _limpiar,
                       ),
                     ),
                   ),
@@ -164,5 +176,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
-

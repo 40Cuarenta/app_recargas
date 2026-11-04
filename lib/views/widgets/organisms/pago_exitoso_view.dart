@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../models/recarga.dart';
 import '../atoms/app_button.dart';
@@ -55,7 +56,7 @@ class PagoExitosoView extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         const AppLabel(
-          text: '¡La recarga ha sido acreditada exitosamente!',
+          text: '¡La operación simulada se confirmó exitosamente!',
           variant: AppLabelVariant.subtitulo,
           textAlign: TextAlign.center,
         ),
@@ -116,13 +117,19 @@ class PagoExitosoView extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const AppLabel(
-                      text: 'COMPROBANTE ELECTRÓNICO',
-                      variant: AppLabelVariant.pequena,
-                      color: AppColors.textoPista,
+                    const Expanded(
+                      child: AppLabel(
+                        text: 'COMPROBANTE ELECTRÓNICO',
+                        variant: AppLabelVariant.pequena,
+                        color: AppColors.textoPista,
+                      ),
                     ),
+                    const SizedBox(width: 12),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.exitoFondo,
                         borderRadius: BorderRadius.circular(6),
@@ -141,10 +148,7 @@ class PagoExitosoView extends StatelessWidget {
                   etiqueta: 'Código de Autorización',
                   valor: recarga.idTransaccion,
                 ),
-                ResumenRow(
-                  etiqueta: 'Fecha y Hora',
-                  valor: fechaStr,
-                ),
+                ResumenRow(etiqueta: 'Fecha y Hora', valor: fechaStr),
                 ResumenRow(
                   etiqueta: 'Número Celular',
                   valor: recarga.numeroTelefono,
@@ -159,10 +163,7 @@ class PagoExitosoView extends StatelessWidget {
                       ? (recarga.paquete?.nombre ?? 'Combo')
                       : 'Recarga Directa',
                 ),
-                ResumenRow(
-                  etiqueta: 'Método de Pago',
-                  valor: metodoStr,
-                ),
+                ResumenRow(etiqueta: 'Método de Pago', valor: metodoStr),
                 const Divider(height: 24),
                 ResumenRow(
                   etiqueta: 'Total Cobrado al Cliente',
@@ -171,7 +172,7 @@ class PagoExitosoView extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 ResumenRow(
-                  etiqueta: 'Ganancia Acreditada al Local',
+                  etiqueta: 'Ganancia estimada del local',
                   valor: '+\$${recarga.ganancia.toStringAsFixed(2)}',
                   colorValor: AppColors.exitoOscuro,
                 ),
@@ -191,4 +192,3 @@ class PagoExitosoView extends StatelessWidget {
     );
   }
 }
-

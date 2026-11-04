@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/formateadores.dart';
 import '../../../models/operadora.dart';
 import '../../../models/paquete.dart';
 import '../../../models/recarga.dart';
@@ -45,7 +47,7 @@ class ComprobanteDetalle extends StatelessWidget {
   /// Comisión calculada en dólares.
   final double comision;
 
-  /// Porcentaje de comisión efectivo aplicado (ej. 0.03 o 0.02).
+  /// Porcentaje de comisión efectivo aplicado (ej. 0.03 o 0.04).
   final double porcentajeComision;
 
   /// Total liquidado (valorBase + comision).
@@ -84,18 +86,19 @@ class ComprobanteDetalle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int pctComisionEntero = (porcentajeComision * 100).round();
-    final int pctGananciaEntero = (operadora.porcentajeGanancia * 100).round();
+    final String porcentajeComisionTexto = formatearPorcentaje(
+      porcentajeComision,
+    );
+    final String porcentajeGananciaTexto = formatearPorcentaje(
+      operadora.porcentajeGanancia,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
         // 1. Número y Operadora
-        const AppTitle(
-          text: 'NUMERO DE RECARGA',
-          size: AppTitleSize.pequeno,
-        ),
+        const AppTitle(text: 'NUMERO DE RECARGA', size: AppTitleSize.pequeno),
         const SizedBox(height: 8),
         Card(
           child: Padding(
@@ -107,7 +110,9 @@ class ComprobanteDetalle extends StatelessWidget {
                   size: 44,
                   iconSize: 22,
                   iconColor: operadora.colorCorporativo,
-                  backgroundColor: operadora.colorCorporativo.withValues(alpha: 0.12),
+                  backgroundColor: operadora.colorCorporativo.withValues(
+                    alpha: 0.12,
+                  ),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -171,7 +176,10 @@ class ComprobanteDetalle extends StatelessWidget {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.secundarioClaro,
                           borderRadius: BorderRadius.circular(6),
@@ -211,10 +219,7 @@ class ComprobanteDetalle extends StatelessWidget {
         const SizedBox(height: 20),
 
         // 3. Método de pago
-        const AppTitle(
-          text: 'Método de pago',
-          size: AppTitleSize.pequeno,
-        ),
+        const AppTitle(text: 'Método de pago', size: AppTitleSize.pequeno),
         const SizedBox(height: 8),
         MetodoPagoSelector(
           metodoSeleccionado: metodoPago,
@@ -224,10 +229,7 @@ class ComprobanteDetalle extends StatelessWidget {
         const SizedBox(height: 20),
 
         // 4. Resumen financiero
-        const AppTitle(
-          text: 'Resumen',
-          size: AppTitleSize.pequeno,
-        ),
+        const AppTitle(text: 'Resumen', size: AppTitleSize.pequeno),
         const SizedBox(height: 8),
         Card(
           child: Padding(
@@ -239,10 +241,11 @@ class ComprobanteDetalle extends StatelessWidget {
                   valor: '\$${valorBase.toStringAsFixed(2)}',
                 ),
                 ResumenRow(
-                  etiqueta: 'Comisión ($pctComisionEntero% ${operadora.nombre})',
+                  etiqueta:
+                      'Comisión ($porcentajeComisionTexto % ${operadora.nombre})',
                   valor: '\$${comision.toStringAsFixed(2)}',
-                  subtitulo: valorBase >= 10.0
-                      ? 'Descuento especial (-1% por monto >= \$10)'
+                  subtitulo: porcentajeComision < operadora.porcentajeComision
+                      ? 'Reducción de 1 punto porcentual por monto desde \$10'
                       : null,
                 ),
                 const Divider(height: 20),
@@ -254,37 +257,18 @@ class ComprobanteDetalle extends StatelessWidget {
                 const SizedBox(height: 4),
                 // Indicador de ganancia para el negocio
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.acentoClaro,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.trending_up_rounded,
-                            size: 16,
-                            color: AppColors.acento,
-                          ),
-                          const SizedBox(width: 6),
-                          AppLabel(
-                            text: 'Ganancia estimada ($pctGananciaEntero%):',
-                            variant: AppLabelVariant.pequena,
-                            color: AppColors.acentoOscuro,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ],
-                      ),
-                      AppLabel(
-                        text: '+\$${ganancia.toStringAsFixed(2)}',
-                        variant: AppLabelVariant.pequena,
-                        color: AppColors.acentoOscuro,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ],
+                  child: ResumenRow(
+                    etiqueta: 'Ganancia estimada ($porcentajeGananciaTexto %):',
+                    valor: '+\$${ganancia.toStringAsFixed(2)}',
+                    colorValor: AppColors.acentoOscuro,
                   ),
                 ),
               ],
@@ -300,9 +284,7 @@ class ComprobanteDetalle extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.errorFondo,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: AppColors.error.withValues(alpha: 0.3),
-              ),
+              border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -337,4 +319,3 @@ class ComprobanteDetalle extends StatelessWidget {
     );
   }
 }
-

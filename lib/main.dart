@@ -30,7 +30,6 @@ class AppRecargas extends StatelessWidget {
         theme: AppTheme.temaClaro,
         initialRoute: AppRoutes.login,
         routes: AppRoutes.routes,
-        onGenerateRoute: AppRoutes.onGenerateRoute,
         onUnknownRoute: AppRoutes.onUnknownRoute,
       ),
     );
